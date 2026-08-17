@@ -1,0 +1,138 @@
+SPARQL QUERIES - HỆ THỐNG PHÂN TÍCH PHẢN HỒI SINH VIÊN NTU
+Prefix: ntu: <http://ntu.edu.vn/feedback_system#>
+=================================================================
+
+-- Q1_TopicGopYNhieuNhat --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?topic (COUNT(?fb) AS ?soLuong)
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutTopic ?topicNode .
+    ?topicNode rdfs:label ?topic .
+    FILTER (?topic != "Khac")
+}
+GROUP BY ?topic
+ORDER BY DESC(?soLuong)
+
+-----------------------------------------------------------------
+
+-- Q2a_TieuCucTheoGV_Count --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?maGV (COUNT(?fb) AS ?soLuongTieuCuc)
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutLecturer ?gvNode .
+    ?gvNode ntu:hasLecturerCode ?maGV .
+    ?fb ntu:hasSentiment ntu:Sent_Negative .
+}
+GROUP BY ?maGV
+ORDER BY DESC(?soLuongTieuCuc)
+
+-----------------------------------------------------------------
+
+-- Q2b_TieuCucTheoGV_Detail --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?fb ?maGV ?noiDung
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutLecturer ?gvNode .
+    ?gvNode ntu:hasLecturerCode ?maGV .
+    ?fb ntu:hasSentiment ntu:Sent_Negative .
+    ?fb ntu:hasContent ?noiDung .
+}
+ORDER BY ?maGV
+
+-----------------------------------------------------------------
+
+-- Q3_PhanHoiTheoHocPhan --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?hocPhan ?sentiment (COUNT(?fb) AS ?soLuong)
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutCourse ?courseNode .
+    ?courseNode ntu:hasCourseCode ?hocPhan .
+    ?fb ntu:hasSentiment ?sentNode .
+    ?sentNode rdfs:label ?sentiment .
+}
+GROUP BY ?hocPhan ?sentiment
+ORDER BY ?hocPhan ?sentiment
+
+-----------------------------------------------------------------
+
+-- Q4_PhanHoiCoSoVatChat --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?fb ?noiDung ?sentiment
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutTopic ntu:Topic_CoSoVatChat .
+    ?fb ntu:hasContent ?noiDung .
+    ?fb ntu:hasSentiment ?sentNode .
+    ?sentNode rdfs:label ?sentiment .
+}
+ORDER BY ?sentiment
+
+-----------------------------------------------------------------
+
+-- Q5_GopYDeXuat --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?fb ?noiDung ?topic
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:hasEmotion ntu:Emo_DeXuat .
+    ?fb ntu:hasContent ?noiDung .
+    ?fb ntu:aboutTopic ?topicNode .
+    ?topicNode rdfs:label ?topic .
+}
+ORDER BY ?topic
+
+-----------------------------------------------------------------
+
+-- Q6_TopGVDuocKhen --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?giangVien (COUNT(?fb) AS ?soLuongKhen)
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:hasEmotion ntu:Emo_KhenNgoi .
+    ?fb ntu:aboutLecturer ?gvNode .
+    ?gvNode ntu:hasLecturerCode ?giangVien .
+}
+GROUP BY ?giangVien
+ORDER BY DESC(?soLuongKhen)
+LIMIT 10
+
+-----------------------------------------------------------------
+
+-- Q7_TyLeSentimentTheoHP --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?hocPhan ?sentiment (COUNT(?fb) AS ?soLuong)
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:aboutCourse ?courseNode .
+    ?courseNode ntu:hasCourseCode ?hocPhan .
+    ?fb ntu:hasSentiment ?sentNode .
+    ?sentNode rdfs:label ?sentiment .
+}
+GROUP BY ?hocPhan ?sentiment
+ORDER BY ?hocPhan DESC(?soLuong)
+
+-----------------------------------------------------------------
+
+-- Q8_PhanHoiThatVong --
+PREFIX ntu: <http://ntu.edu.vn/feedback_system#>
+SELECT ?fb ?giangVien ?hocPhan ?noiDung
+WHERE {
+    ?fb a ntu:Feedback .
+    ?fb ntu:hasEmotion ntu:Emo_ThatVong .
+    ?fb ntu:hasContent ?noiDung .
+    OPTIONAL {
+        ?fb ntu:aboutLecturer ?gvNode .
+        ?gvNode ntu:hasLecturerCode ?giangVien .
+    }
+    OPTIONAL {
+        ?fb ntu:aboutCourse ?courseNode .
+        ?courseNode ntu:hasCourseCode ?hocPhan .
+    }
+}
+
+-----------------------------------------------------------------
+
